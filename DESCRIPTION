@@ -1,0 +1,17 @@
+Package: reconexoes
+Title: Dados da Pnad 2018T2
+Version: 0.0.1
+Authors@R: person("Tomás", "Barcellos", email = "tomas.barcellos@gmail.com", role = c("aut", "cre"))
+Description: Pacote com dados, metodologia e análise do perfil das profissões no Brasil.
+Depends: R (>= 3.5.0)
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    magrittr,
+    dplyr,
+    microdadosBrasil,
+    usethis,
+    readxl,
+    tidyr
+RoxygenNote: 6.1.1
