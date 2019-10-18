@@ -54,3 +54,36 @@ descricao_instrucao <- function(x) {
     TRUE ~ "Não aplicável"
   )
 }
+
+#' Ler PNAD continua
+#'
+#' @param arquivo arquivo com microdados
+#' @param periodo periodo que será lido
+#'
+#' @return Uma tibble com 19 variaveis com dados do período indicado
+ler_pnadc <- function(arquivo, periodo) {
+  vars <- c("Ano", "Trimestre", "UF", "Estrato",
+            "V1008", "V1014", "V1016", "V1022", "V1027", "V1028", "posest",
+            "V4010", "V2007", "V2010", "VD4016",
+            "V2009", "V4039", "VD3001", "V4012")
+
+  microdadosBrasil::read_PNADcontinua(
+    "pessoas", periodo, file = arquivo, vars_subset = vars
+  ) %>%
+    dplyr::as_tibble() %>%
+    dplyr::rename(
+      ano = Ano, trimestre = Trimestre, uf = UF, estrato = Estrato,
+      num_domicilio = V1008, grupo_amostra = V1014, num_entrevista = V1016,
+      situacao_domicilio = V1022, peso_sem_posestrat = V1027,
+      peso_com_posestrat = V1028, profissao = V4010, sexo = V2007, cor = V2010,
+      rendimento = VD4016, idade = V2009, horas_trabalhadas = V4039,
+      nivel_instrucao = VD3001, tipo_vinculo = V4012
+    ) %>%
+    dplyr::mutate_at(dplyr::vars(ano:estrato), as.integer) %>%
+    dplyr::mutate(
+      sexo = descricao_sexo(sexo),
+      cor = descricao_cor(cor),
+      tipo_vinculo = descricao_vinculo(tipo_vinculo),
+      nivel_instrucao = descricao_instrucao(nivel_instrucao)
+    )
+}
