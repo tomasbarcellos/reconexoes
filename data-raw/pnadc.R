@@ -30,35 +30,10 @@ pnadc <- microdadosBrasil::read_PNADcontinua(
   ) %>%
   dplyr::mutate_at(dplyr::vars(ano:estrato), as.integer) %>%
   dplyr::mutate(
-    sexo = ifelse(sexo == 1, "Homem", "Mulher"),
-    cor = dplyr::case_when(
-      cor ==  1 ~ "Branca",
-      cor ==  2 ~ "Preta",
-      cor ==  3 ~ "Amarela",
-      cor ==  4 ~ "Parda",
-      cor ==  5 ~ "Indígena",
-      cor ==  9 ~ "Ignorado"
-    ),
-    tipo_vinculo = dplyr::case_when(
-      tipo_vinculo == 1 ~ "Trabalhador doméstico",
-      tipo_vinculo == 2 ~ "Militar",
-      tipo_vinculo == 3 ~ "Empregado do setor privado",
-      tipo_vinculo == 4 ~ "Empregado do setor público",
-      tipo_vinculo == 5 ~ "Empregador",
-      tipo_vinculo == 6 ~ "Conta própria",
-      tipo_vinculo == 7 ~ "Trabalhador familiar não remunerado",
-      TRUE ~ "Não aplicável"
-    ),
-    nivel_instrucao = dplyr::case_when(
-      nivel_instrucao == 1 ~ "Sem instrução e menos de 1 ano de estudo",
-      nivel_instrucao == 2 ~ "Fundamental incompleto ou equivalente",
-      nivel_instrucao == 3 ~ "Fundamental completo ou equivalente",
-      nivel_instrucao == 4 ~ "Médio incompleto ou equivalente",
-      nivel_instrucao == 5 ~ "Médio completo ou equivalente",
-      nivel_instrucao == 6 ~ "Superior incompleto ou equivalente",
-      nivel_instrucao == 7 ~ "Superior completo",
-      TRUE ~ "Não aplicável"
-    )
+    sexo = descricao_sexo(sexo),
+    cor = descricao_cor(cor),
+    tipo_vinculo = descricao_vinculo(tipo_vinculo),
+    nivel_instrucao = descricao_instrucao(nivel_instrucao)
   )
 
 tf <- tempfile()
