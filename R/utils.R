@@ -87,3 +87,54 @@ ler_pnadc <- function(arquivo, periodo) {
       nivel_instrucao = descricao_instrucao(nivel_instrucao)
     )
 }
+
+
+#' Listar arquivos e pastas de repositório FTP
+#'
+#' @param path Caminho listado
+#'
+#' @return Um vetor com arquivos e pastas encontrados
+ls <- function(path) {
+  RCurl::getURL(path, ftp.use.epsv=TRUE, dirlistonly = TRUE) %>%
+    stringr::str_split("\\s+") %>%
+    magrittr::extract2(1)
+}
+
+
+#' Listar todos os arquivos da PNAD Contínua
+#'
+#' @return Um vetor com o caminho para os arquivos dos microsdados da PNADC
+arquivos_pnadc <- function() {
+  link_raiz <- paste0(
+    "ftp://ftp.ibge.gov.br/Trabalho_e_Rendimento/",
+    "Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/"
+  )
+
+  pastas_anos <- ls(link_raiz) %>%
+    stringr::str_subset("^\\d{4}$")
+
+  arquivos <- paste0(link_raiz, pastas_anos, "/") %>%
+    purrr::map(ls) %>%
+    purrr::map(~stringr::str_subset(.x, "^PNADC.+\\.zip"))
+
+  purrr::map2(pastas_anos, arquivos, ~paste0(link_raiz, .x, "/", .y)) %>%
+    unlist()
+}
+
+#' Corrigir nomes da PNADC no pacote microdadosBrasil
+#'
+#' @return Um vetor de TRUE/FALSE para casos que fez a troca com sucesso.
+corrigir_nomes_pnadc <- function() {
+  arquivos <- dir(
+    system.file("extdata", "dics", package = "microdadosBrasil"), full.names = TRUE
+  ) %>%
+    str_subset("PNADcontinua")
+
+  file.rename(arquivos, stringr::str_replace(arquivos, "PNADcontinua", "PnadContinua"))
+}
+
+# Procedimento para download e leitura de arquivos
+#
+# download.file(link, "dados/pnadc_201201.zip")
+# unzip("dados/pnadc_201201.zip")
+
