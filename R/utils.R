@@ -64,7 +64,7 @@ descricao_instrucao <- function(x) {
 ler_pnadc <- function(arquivo, periodo) {
   vars <- c("Ano", "Trimestre", "UF", "Estrato",
             "V1008", "V1014", "V1016", "V1022", "V1027", "V1028", "posest",
-            "V4010", "V2007", "V2010", "VD4016",
+            "V4010", "V2007", "V2010", "V403312",
             "V2009", "V4039", "VD3001", "V4012")
 
   microdadosBrasil::read_PNADcontinua(
@@ -76,7 +76,7 @@ ler_pnadc <- function(arquivo, periodo) {
       num_domicilio = V1008, grupo_amostra = V1014, num_entrevista = V1016,
       situacao_domicilio = V1022, peso_sem_posestrat = V1027,
       peso_com_posestrat = V1028, profissao = V4010, sexo = V2007, cor = V2010,
-      rendimento = VD4016, idade = V2009, horas_trabalhadas = V4039,
+      rendimento = V403312, idade = V2009, horas_trabalhadas = V4039,
       nivel_instrucao = VD3001, tipo_vinculo = V4012
     ) %>%
     dplyr::mutate_at(dplyr::vars(ano:estrato), as.integer) %>%
@@ -94,7 +94,7 @@ ler_pnadc <- function(arquivo, periodo) {
 #' @param path Caminho listado
 #'
 #' @return Um vetor com arquivos e pastas encontrados
-ls <- function(path) {
+ftp_ls <- function(path) {
   RCurl::getURL(path, ftp.use.epsv=TRUE, dirlistonly = TRUE) %>%
     stringr::str_split("\\s+") %>%
     magrittr::extract2(1)
@@ -110,11 +110,11 @@ arquivos_pnadc <- function() {
     "Pesquisa_Nacional_por_Amostra_de_Domicilios_continua/Trimestral/Microdados/"
   )
 
-  pastas_anos <- ls(link_raiz) %>%
+  pastas_anos <- ftp_ls(link_raiz) %>%
     stringr::str_subset("^\\d{4}$")
 
   arquivos <- paste0(link_raiz, pastas_anos, "/") %>%
-    purrr::map(ls) %>%
+    purrr::map(ftp_ls) %>%
     purrr::map(~stringr::str_subset(.x, "^PNADC.+\\.zip"))
 
   purrr::map2(pastas_anos, arquivos, ~paste0(link_raiz, .x, "/", .y)) %>%
